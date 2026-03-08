@@ -113,13 +113,14 @@ module.exports = function (io, db) {
       const trimmed = (username || "").trim();
       if (!trimmed || trimmed.length < 2)
         return cb({ ok: false, error: "Username must be at least 2 characters" });
-      if (!password || password.length < 4)
+      const pass = (password || "").trim();
+      if (!pass || pass.length < 4)
         return cb({ ok: false, error: "Password must be at least 4 characters" });
 
       if (db.getUserByUsername(trimmed))
         return cb({ ok: false, error: "Username already taken" });
 
-      const { hash, salt } = hashPassword(password);
+      const { hash, salt } = hashPassword(pass);
       const userId = "user-" + rid();
       const discriminator = String(Math.floor(1000 + Math.random() * 9000));
       const user = {
@@ -150,15 +151,16 @@ module.exports = function (io, db) {
 
     socket.on("auth:login", ({ username, password }, cb) => {
       const trimmed = (username || "").trim();
+      const pass = (password || "").trim();
       const users = db.getState().users;
       const found = Object.values(users).find(
         (u) => u.username.toLowerCase() === trimmed.toLowerCase()
       );
-      if (!found || !verifyPassword(password, found.passwordHash, found.passwordSalt))
+      if (!found || !verifyPassword(pass, found.passwordHash, found.passwordSalt))
         return cb({ ok: false, error: "Invalid username or password" });
 
       if (!found.passwordSalt) {
-        const { hash, salt } = hashPassword(password);
+        const { hash, salt } = hashPassword(pass);
         db.updateUser(found.id, { passwordHash: hash, passwordSalt: salt });
       }
 
