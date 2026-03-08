@@ -34,10 +34,12 @@ export function InviteModal({ serverId, open, onClose }: InviteModalProps) {
   const memberCount = serverMemberUserIds.size;
 
   const invitableUsers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return [];
     return Object.values(users).filter((u) => {
       if (u.id === currentUserId) return false;
       if (serverMemberUserIds.has(u.id)) return false;
-      if (search && !u.username.toLowerCase().includes(search.toLowerCase())) return false;
+      if (!u.username.toLowerCase().includes(q) && !String(u.discriminator ?? "").includes(q)) return false;
       return true;
     });
   }, [users, currentUserId, serverMemberUserIds, search]);
@@ -115,7 +117,7 @@ export function InviteModal({ serverId, open, onClose }: InviteModalProps) {
           <div className="max-h-48 overflow-y-auto space-y-1">
             {invitableUsers.length === 0 && (
               <p className="text-sm text-[#949ba4] text-center py-4">
-                {search ? "No users found" : "No users to invite"}
+                {search.trim() ? "No users found. Try a different username." : "Type a username to search for users to invite."}
               </p>
             )}
             {invitableUsers.map((user) => {

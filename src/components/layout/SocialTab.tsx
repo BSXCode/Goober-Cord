@@ -28,13 +28,14 @@ export function SocialTab() {
     return ids;
   }, [currentUserId, dmChannels]);
 
-  // All users except self and existing friends
+  // Only show users that match the search (must type to see anyone)
   const availableUsers = useMemo(() => {
     if (!currentUserId) return [];
     const q = search.trim().toLowerCase();
+    if (!q) return [];
     return Object.values(users)
       .filter((u) => u.id !== currentUserId && !existingFriendIds.has(u.id))
-      .filter((u) => !q || u.username.toLowerCase().includes(q) || u.discriminator.includes(q))
+      .filter((u) => u.username.toLowerCase().includes(q) || u.discriminator.includes(q))
       .slice(0, 20);
   }, [users, currentUserId, existingFriendIds, search]);
 
