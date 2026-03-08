@@ -1,0 +1,21 @@
+# Dependencies and build
+node_modules/
+.next/
+out/
+
+# Data and env (do not commit)
+data/
+.env
+.env.local
+.env.*.local
+
+# Logs and OS
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
